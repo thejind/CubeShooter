@@ -54,7 +54,7 @@ void UMultiplayerManager::OnJoinSessionComplete(FName SessionName, EOnJoinSessio
 	}
 }
 
-void UMultiplayerManager::CreateServer()
+void UMultiplayerManager::CreateSession()
 {
 	UE_LOG(LogTemp, Warning, TEXT("CreateServer"));
 	FOnlineSessionSettings SessionSettings;
@@ -68,7 +68,7 @@ void UMultiplayerManager::CreateServer()
 	SessionInterface->CreateSession(0, FName("Create Session"), SessionSettings);
 }
 
-void UMultiplayerManager::JoinServer()
+void UMultiplayerManager::JoinSession()
 {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	SessionSearch->bIsLanQuery = (Online::GetSubsystem(GetWorld())->GetSubsystemName() == "NULL");

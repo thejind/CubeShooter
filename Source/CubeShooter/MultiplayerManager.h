@@ -23,10 +23,10 @@ public:
 	FDelegateHandle FindSessionsCompleteDelegateHandle;	
 	
 	UFUNCTION(BlueprintCallable)
-	void CreateServer();
+	void CreateSession();
 
 	UFUNCTION(BlueprintCallable)
-	void JoinServer();
+	void JoinSession();
 	
 protected:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;

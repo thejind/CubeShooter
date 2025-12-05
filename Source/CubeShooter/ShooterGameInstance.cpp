@@ -25,7 +25,7 @@ void UShooterGameInstance::HostSessionWithCode(const FString& JoinCode)
 	{
 		MultiplayerManager = NewObject<UMultiplayerManager>(this);
 	}
-	MultiplayerManager->CreateServer();
+	MultiplayerManager->CreateSession();
 }
 
 void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
@@ -34,7 +34,7 @@ void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
 	{
 		MultiplayerManager = NewObject<UMultiplayerManager>(this);
 	}
-	MultiplayerManager->JoinServer();
+	MultiplayerManager->JoinSession();
 }
 
 
