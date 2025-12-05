@@ -51,10 +51,49 @@ void UMultiplayerManager::OnCreateSessionComplete(FName SessionName, bool bWasSu
 
 void UMultiplayerManager::OnFindSessionsComplete(bool bWasSuccessful)
 {
+	if (!bWasSuccessful || !SessionSearch.IsValid() || SessionSearch->SearchResults.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No sessions found matching the code."));
+		return;
+	}
+ 
+	if (IOnlineSessionPtr SessionInterface = GetSessionInterface())
+	{
+		for (const FOnlineSessionSearchResult& Result : SessionSearch->SearchResults)
+		{
+			FString Code;
+			if (Result.Session.SessionSettings.Get(FName("JOIN_CODE"), Code)
+				&& Code == PendingJoinCode)
+			{
+				SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(
+					FOnJoinSessionCompleteDelegate::CreateUObject(this, &UMultiplayerManager::OnJoinSessionComplete)
+				);
+				SessionInterface->JoinSession(0, FName("GameSession"), Result);
+				return;
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Session with code %s not found."), *PendingJoinCode);
+	}
 }
 
 void UMultiplayerManager::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
+	if (IOnlineSessionPtr SessionInterface = GetSessionInterface())
+	{
+		FString ConnectString;
+		if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
+		{
+			if (APlayerController* PC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObjectChecked(this)))
+			{
+				PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
+				UE_LOG(LogTemp, Log, TEXT("Joining session at %s"), *ConnectString);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to get connect string."));
+		}
+	}
 }
 
 IOnlineSessionPtr UMultiplayerManager::GetSessionInterface() const
