@@ -91,7 +91,7 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
     if (Controller)
     {
         AddControllerYawInput(LookAxisValue.X);
-        AddControllerPitchInput(LookAxisValue.Y);
+        AddControllerPitchInput(-LookAxisValue.Y);
     }
 }
 
