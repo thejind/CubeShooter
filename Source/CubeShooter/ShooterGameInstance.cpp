@@ -13,13 +13,19 @@ void UShooterGameInstance::Init()
 	}
 }
 
+void UShooterGameInstance::Shutdown()
+{
+	Super::Shutdown();
+	
+}
+
 void UShooterGameInstance::HostSessionWithCode(const FString& JoinCode)
 {
 	if (!MultiplayerManager)
 	{
 		MultiplayerManager = NewObject<UMultiplayerManager>(this);
 	}
-	MultiplayerManager->HostSession(JoinCode);
+	MultiplayerManager->CreateServer();
 }
 
 void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
@@ -28,11 +34,7 @@ void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
 	{
 		MultiplayerManager = NewObject<UMultiplayerManager>(this);
 	}
-	MultiplayerManager->JoinSession(JoinCode);
+	MultiplayerManager->JoinServer();
 }
 
-void UShooterGameInstance::SetMapToJoin(const FString& MapToJoin)
-{
-	MultiplayerManager->MapToJoinObjectLocation(MapToJoin);
-}
 

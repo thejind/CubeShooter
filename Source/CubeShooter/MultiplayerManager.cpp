@@ -2,110 +2,78 @@
 
 
 #include "MultiplayerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "OnlineSubsystemUtils.h"
 
 UMultiplayerManager::UMultiplayerManager()
 {
+	if (IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
+	{
+		SessionInterface = Subsystem->GetSessionInterface();
+	}
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-}
-
-void UMultiplayerManager::HostSession(const FString& JoinCode)
-{
-	if (IOnlineSessionPtr SessionInterface = GetSessionInterface())
+	if (SessionInterface.IsValid())
 	{
-		FOnlineSessionSettings Settings;
-		Settings.bIsLANMatch = true;
-		Settings.NumPublicConnections = 4;
-		Settings.bShouldAdvertise = true;
-		Settings.bUsesPresence = false;
-		Settings.Set(FName("JOIN_CODE"), JoinCode, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
- 
-		SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(
-			FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMultiplayerManager::OnCreateSessionComplete)
-		);
- 
-		SessionInterface->CreateSession(0, FName("GameSession"), Settings);
- 
-		UE_LOG(LogTemp, Log, TEXT("Hosting session with code: %s"), *JoinCode);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No valid session interface for hosting."));
+		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnCreateSessionComplete);
+		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnFindSessionComplete);
+		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnJoinSessionComplete);
 	}
 }
 
-void UMultiplayerManager::JoinSession(const FString& JoinCode)
+void UMultiplayerManager::OnCreateSessionComplete(FName SessionName, bool Succeeded)
 {
-}
-
-void UMultiplayerManager::MapToJoinObjectLocation(const FString& Map)
-{
-	MapToJoin = Map;
-}
-
-void UMultiplayerManager::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
-{
-	UE_LOG(LogTemp, Log, TEXT("Session creation %s"), bWasSuccessful ? TEXT("succeeded") : TEXT("failed"));
-	if (bWasSuccessful)
+	if (Succeeded)
 	{
-		if (UWorld* World = GEngine->GetWorldFromContextObjectChecked(this))
+		GetWorld()->ServerTravel("/Game/Maps/DefaultMap?listen");
+	}
+}
+
+void UMultiplayerManager::OnFindSessionComplete(bool Succeeded)
+{
+	if (Succeeded)
+	{
+		TArray<FOnlineSessionSearchResult> SearchResults = SessionSearch->SearchResults;
+
+		if (SearchResults.Num())
 		{
-			World->ServerTravel(MapToJoin);
+			SessionInterface->JoinSession(0, FName("Create Session"), SearchResults[0]);
 		}
-	}
-}
-
-void UMultiplayerManager::OnFindSessionsComplete(bool bWasSuccessful)
-{
-	if (!bWasSuccessful || !SessionSearch.IsValid() || SessionSearch->SearchResults.Num() == 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No sessions found matching the code."));
-		return;
-	}
- 
-	if (IOnlineSessionPtr SessionInterface = GetSessionInterface())
-	{
-		for (const FOnlineSessionSearchResult& Result : SessionSearch->SearchResults)
-		{
-			FString Code;
-			if (Result.Session.SessionSettings.Get(FName("JOIN_CODE"), Code)
-				&& Code == PendingJoinCode)
-			{
-				SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(
-					FOnJoinSessionCompleteDelegate::CreateUObject(this, &UMultiplayerManager::OnJoinSessionComplete)
-				);
-				SessionInterface->JoinSession(0, FName("GameSession"), Result);
-				return;
-			}
-		}
-		UE_LOG(LogTemp, Warning, TEXT("Session with code %s not found."), *PendingJoinCode);
 	}
 }
 
 void UMultiplayerManager::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	if (IOnlineSessionPtr SessionInterface = GetSessionInterface())
+	if(APlayerController* PController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 	{
-		FString ConnectString;
-		if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
+		FString JoinAddress = "";
+		SessionInterface->GetResolvedConnectString(SessionName, JoinAddress);
+		if(JoinAddress != "")
 		{
-			if (APlayerController* PC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObjectChecked(this)))
-			{
-				PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
-				UE_LOG(LogTemp, Log, TEXT("Joining session at %s"), *ConnectString);
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to get connect string."));
+			PController->ClientTravel(JoinAddress, ETravelType::TRAVEL_Absolute);
 		}
 	}
 }
 
-IOnlineSessionPtr UMultiplayerManager::GetSessionInterface() const
+void UMultiplayerManager::CreateServer()
 {
-	if (const IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get())
-	{
-		return OnlineSub->GetSessionInterface();
-	}
-	return nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("CreateServer"));
+	FOnlineSessionSettings SessionSettings;
+	SessionSettings.bAllowJoinInProgress = true;
+	SessionSettings.bIsDedicated = false;
+	SessionSettings.bIsLANMatch = (Online::GetSubsystem(GetWorld())->GetSubsystemName() == "NULL");
+	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.bUsesPresence = true;
+	SessionSettings.NumPublicConnections = 5;
+
+	SessionInterface->CreateSession(0, FName("Create Session"), SessionSettings);
+}
+
+void UMultiplayerManager::JoinServer()
+{
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	SessionSearch->bIsLanQuery = (Online::GetSubsystem(GetWorld())->GetSubsystemName() == "NULL");
+	SessionSearch->MaxSearchResults = 10000;
+	SessionSearch->QuerySettings.Set("SEARCH_PRESENCE", true, EOnlineComparisonOp::Equals);
+
+	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 }

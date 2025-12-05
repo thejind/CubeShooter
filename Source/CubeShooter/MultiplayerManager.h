@@ -18,27 +18,25 @@ class CUBESHOOTER_API UMultiplayerManager : public UObject
 	
 public:
 	UMultiplayerManager();
- 
-	// Host a session with a join code
-	UFUNCTION(BlueprintCallable, Category="Multiplayer")
-	void HostSession(const FString& JoinCode);
- 
-	// Find and join a session by join code
-	UFUNCTION(BlueprintCallable, Category="Multiplayer")
-	void JoinSession(const FString& JoinCode);
 	
-	void MapToJoinObjectLocation(const FString& Map);
+	FDelegateHandle CreateSessionCompleteDelegateHandle;
+	FDelegateHandle FindSessionsCompleteDelegateHandle;	
 	
-	FString MapToJoin;
+	UFUNCTION(BlueprintCallable)
+	void CreateServer();
+
+	UFUNCTION(BlueprintCallable)
+	void JoinServer();
 	
-private:
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionsComplete(bool bWasSuccessful);
-	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
- 
+protected:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
-	FString PendingJoinCode;
- 
-	IOnlineSessionPtr GetSessionInterface() const;
+
+	IOnlineSessionPtr SessionInterface;
+	
+
+	virtual void OnCreateSessionComplete(FName SessionName, bool Succeeded);
+	virtual void OnFindSessionComplete(bool Succeeded);
+	virtual void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	
 	
 };
