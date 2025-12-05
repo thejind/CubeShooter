@@ -16,17 +16,13 @@ AShooterCharacter::AShooterCharacter()
     PrimaryActorTick.bCanEverTick = true;
     GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
     bReplicates = true;
+    SetReplicateMovement(true);
     FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
     FPSCameraComponent->SetupAttachment(GetCapsuleComponent());
     FPSCameraComponent->SetRelativeLocation(FVector(0, 0, 64.f));
     FPSCameraComponent->bUsePawnControlRotation = true;
-
-    FPSMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FirstPersonMesh"));
-    FPSMesh->SetupAttachment(FPSCameraComponent);
-    FPSMesh->SetOnlyOwnerSee(true);
-    FPSMesh->bCastDynamicShadow = false;
-    FPSMesh->CastShadow = false;
-    GetMesh()->SetOwnerNoSee(true);
+    
+    GetMesh()->SetOwnerNoSee(false);
 
     MuzzleOffset = FVector(100.f, 0.f, 0.f);
     
@@ -98,18 +94,23 @@ void AShooterCharacter::UpdatePlayerNameWidget()
 {
     if (UUserWidget* Widget = NameWidgetComponent->GetUserWidgetObject())
     {
-        if (UPlayerNameWidget* NameWidget = Cast<UPlayerNameWidget>(Widget))
-        {
-            if (APlayerState* PS = GetPlayerState())
+       
+            if (auto NameWidget = Cast<UPlayerNameWidget>(Widget))
             {
-                NameWidget->SetPlayerName(PS->GetPlayerName());
+                FString PlayerName = TEXT("Unknown");
+                if (APlayerState* PS = GetPlayerState())
+                {
+                    PlayerName = PS->GetPlayerName();
+                }
+                NameWidget->SetPlayerName(PlayerName);
             }
-        }
+        
     }
 }
 
 void AShooterCharacter::OnPlayerNameChanged()
 {
+    UpdatePlayerNameWidget();
 }
 
 void AShooterCharacter::Move(const FInputActionValue& Value)
@@ -150,5 +151,5 @@ void AShooterCharacter::Fire(const FInputActionValue& Value)
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    DOREPLIFETIME(AShooterCharacter, FPSMesh);
+    
 }

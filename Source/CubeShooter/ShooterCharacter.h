@@ -67,9 +67,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FPSCameraComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	UStaticMeshComponent* FPSMesh; // Using Static Mesh to keep it simple
-
 	UPROPERTY(EditAnywhere, Category = Gameplay)
 	FVector MuzzleOffset;
 	
