@@ -9,7 +9,7 @@ public class CubeShooter : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-			"OnlineSubsystem", "OnlineSubsystemUtils" });
+			"OnlineSubsystem", "OnlineSubsystemUtils", "UMG", "Slate", "SlateCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

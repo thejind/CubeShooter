@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "FPSCharacter.generated.h"
+#include "Components/WidgetComponent.h"
+#include "ShooterCharacter.generated.h"
 
 class UCameraComponent;
 class UInputMappingContext;
@@ -13,12 +13,12 @@ class UInputAction;
 class ACubeProjectile;
 
 UCLASS()
-class CUBESHOOTER_API AFPSCharacter : public ACharacter
+class CUBESHOOTER_API AShooterCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AFPSCharacter();
+	AShooterCharacter();
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,6 +41,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> FireAction;
 
+	// Widget component to hold the player name widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* NameWidgetComponent;
+ 
+	// The widget class to use for the player name (set in Blueprint or defaults)
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> PlayerNameWidgetClass;
+	
+	// Updates the name displayed in the widget
+	void UpdatePlayerNameWidget();
+ 
+	// Called when PlayerState is replicated or updated to refresh the widget
+	UFUNCTION()
+	void OnPlayerNameChanged();
+	
 	// Input callbacks
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -53,8 +68,10 @@ private:
 	UCameraComponent* FPSCameraComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FPSMesh;
+	UStaticMeshComponent* FPSMesh; // Using Static Mesh to keep it simple
 
 	UPROPERTY(EditAnywhere, Category = Gameplay)
 	FVector MuzzleOffset;
+	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
