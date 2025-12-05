@@ -37,6 +37,11 @@ void UMultiplayerManager::JoinSession(const FString& JoinCode)
 {
 }
 
+void UMultiplayerManager::MapToJoinObjectLocation(const FString& Map)
+{
+	MapToJoin = Map;
+}
+
 void UMultiplayerManager::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	UE_LOG(LogTemp, Log, TEXT("Session creation %s"), bWasSuccessful ? TEXT("succeeded") : TEXT("failed"));
@@ -44,7 +49,7 @@ void UMultiplayerManager::OnCreateSessionComplete(FName SessionName, bool bWasSu
 	{
 		if (UWorld* World = GEngine->GetWorldFromContextObjectChecked(this))
 		{
-			World->ServerTravel("/Game/Maps/YourMap?listen"); // Change to your map path
+			World->ServerTravel(MapToJoin);
 		}
 	}
 }

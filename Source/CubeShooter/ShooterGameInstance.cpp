@@ -4,6 +4,15 @@
 #include "ShooterGameInstance.h"
 #include "MultiplayerManager.h"
 
+void UShooterGameInstance::Init()
+{
+	Super::Init();
+	if (!MultiplayerManager)
+	{
+		MultiplayerManager = NewObject<UMultiplayerManager>(this);
+	}
+}
+
 void UShooterGameInstance::HostSessionWithCode(const FString& JoinCode)
 {
 	if (!MultiplayerManager)
@@ -21,3 +30,9 @@ void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
 	}
 	MultiplayerManager->JoinSession(JoinCode);
 }
+
+void UShooterGameInstance::SetMapToJoin(const FString& MapToJoin)
+{
+	MultiplayerManager->MapToJoinObjectLocation(MapToJoin);
+}
+

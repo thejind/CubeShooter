@@ -17,6 +17,9 @@ class CUBESHOOTER_API UShooterGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
+	
+	virtual void Init() override;
+	
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void HostSessionWithCode(const FString& JoinCode);
  
@@ -26,4 +29,7 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UMultiplayerManager> MultiplayerManager;
+	
+	UFUNCTION(BlueprintCallable, Category="Multiplayer")
+	void SetMapToJoin(const FString& MapToJoin);
 };

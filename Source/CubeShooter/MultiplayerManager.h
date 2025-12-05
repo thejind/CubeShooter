@@ -26,7 +26,11 @@ public:
 	// Find and join a session by join code
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void JoinSession(const FString& JoinCode);
- 
+	
+	void MapToJoinObjectLocation(const FString& Map);
+	
+	FString MapToJoin;
+	
 private:
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionsComplete(bool bWasSuccessful);
