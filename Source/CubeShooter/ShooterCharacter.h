@@ -19,7 +19,10 @@ class CUBESHOOTER_API AShooterCharacter : public ACharacter
 
 public:
 	AShooterCharacter();
-
+	
+	/** Called when PlayerState is replicated on clients */
+	virtual void OnRep_PlayerState() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -48,13 +51,10 @@ protected:
 	// The widget class to use for the player name (set in Blueprint or defaults)
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> PlayerNameWidgetClass;
-	
-	// Updates the name displayed in the widget
-	void UpdatePlayerNameWidget();
  
 	// Called when PlayerState is replicated or updated to refresh the widget
 	UFUNCTION()
-	void OnPlayerNameChanged();
+	void OnPlayerNameChanged(const FString& NewName);
 	
 	// Input callbacks
 	void Move(const FInputActionValue& Value);
@@ -62,6 +62,7 @@ protected:
 	void JumpStarted(const FInputActionValue& Value);
 	void JumpStopped(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
+
 
 private:
 	UPROPERTY(VisibleAnywhere)

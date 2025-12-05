@@ -34,6 +34,12 @@ AShooterCharacter::AShooterCharacter()
     NameWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 110.f)); // Adjust above head height
 }
 
+void AShooterCharacter::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+    
+}
+
 void AShooterCharacter::BeginPlay()
 {
     Super::BeginPlay();
@@ -56,10 +62,15 @@ void AShooterCharacter::BeginPlay()
     {
         NameWidgetComponent->SetWidgetClass(PlayerNameWidgetClass);
     }
- 
-    UpdatePlayerNameWidget();
     
-    
+    if (APlayerState* PS = GetPlayerState())
+    {
+        if (AShooterPlayerState* SPS = Cast<AShooterPlayerState>(PS))
+        {
+            SPS->OnPlayerNameChanged.AddDynamic(this, &ThisClass::OnPlayerNameChanged);
+            OnPlayerNameChanged(SPS->DisplayName);
+        }
+    }
 }
 
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -90,27 +101,19 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     }
 }
 
-void AShooterCharacter::UpdatePlayerNameWidget()
+void AShooterCharacter::OnPlayerNameChanged(const FString& NewName)
 {
     if (UUserWidget* Widget = NameWidgetComponent->GetUserWidgetObject())
     {
-       
-            if (auto NameWidget = Cast<UPlayerNameWidget>(Widget))
-            {
-                FString PlayerName = TEXT("Unknown");
-                if (APlayerState* PS = GetPlayerState())
-                {
-                    PlayerName = PS->GetPlayerName();
-                }
-                NameWidget->SetPlayerName(PlayerName);
-            }
-        
+        if (auto NameWidget = Cast<UPlayerNameWidget>(Widget))
+        {
+            NameWidget->SetDisplayName(NewName);
+        }
+        GEngine->AddOnScreenDebugMessage(
+            -1, 3.0f, FColor::Green,
+            FString::Printf(TEXT("Name updated OnPNC Char: %s"), *NewName)
+        );
     }
-}
-
-void AShooterCharacter::OnPlayerNameChanged()
-{
-    UpdatePlayerNameWidget();
 }
 
 void AShooterCharacter::Move(const FInputActionValue& Value)
@@ -147,6 +150,8 @@ void AShooterCharacter::Fire(const FInputActionValue& Value)
 {
     
 }
+
+
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {

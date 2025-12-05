@@ -19,5 +19,5 @@ public:
 	class UTextBlock* PlayerNameText;
  
 	UFUNCTION(BlueprintCallable, Category="Player")
-	void SetPlayerName(const FString& NewName);
+	void SetDisplayName(const FString& NewName);
 };

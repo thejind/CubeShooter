@@ -26,7 +26,12 @@ public:
  
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void JoinSessionWithCode(const FString& JoinCode);
- 
+	
+	UFUNCTION(BlueprintCallable, Category="Multiplayer")
+	void SetPendingDisplayName(const FString& DisplayName);
+	
+	FString PendingDisplayName;
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UMultiplayerManager> MultiplayerManager;

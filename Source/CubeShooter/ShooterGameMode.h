@@ -13,4 +13,7 @@ UCLASS()
 class CUBESHOOTER_API AShooterGameMode : public AGameMode
 {
 	GENERATED_BODY()
+	
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	
 };

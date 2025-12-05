@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerState.h"
 #include "ShooterPlayerState.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerNameChanged, const FString&, NewName);
+
 /**
  * 
  */
@@ -19,26 +22,33 @@ public:
 	AShooterPlayerState();
 	
 	// Getters
-	FORCEINLINE FString GetPlayerName() const { return ShooterName; }
+	FORCEINLINE FString GetDisplayName() const { return DisplayName; }
 	FORCEINLINE int32 GetPlayerScore() const { return PlayerScore;}
 	
-	
-	void SetPlayerScore(int32 NewScore);
 	UFUNCTION(BlueprintCallable, Category = "Components|PlayerState")
-	void SetPlayerName(const FString& NewName);
+	void SetDisplayName(const FString& NewName);
+	
+	void AddPlayerScore(int32 Delta);
+	
+	FOnPlayerNameChanged OnPlayerNameChanged;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	// Called when PlayerName replicated
 	UFUNCTION()
-	void OnRep_ShooterName();
+	void OnRep_DisplayName();
 	
 	// Called when PlayerName replicated
 	UFUNCTION()
 	void OnRep_PlayerScore();
 	
-	UPROPERTY(ReplicatedUsing=OnRep_ShooterName)
-	FString ShooterName;
+	UFUNCTION() 
+	void OnRep_PlayerColor();
+	
+	UPROPERTY(ReplicatedUsing=OnRep_DisplayName)
+	FString DisplayName;
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerScore)
 	int32 PlayerScore;
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerColor) 
+	FLinearColor PlayerColor;
 };
