@@ -66,7 +66,11 @@ void AShooterCharacter::BeginPlay()
         NameWidgetComponent->SetWidgetClass(PlayerNameWidgetClass);
     }
     
+   
     SetupLocalDisplayName();
+    
+    //Timer To Setup Other player's nametag on to face the owning client Player Character
+    //not using tick but FTimerHandle
     GetWorldTimerManager().SetTimer(FWidgetRotationTimer, this, &ThisClass::SetNameTagRotationToPlayer, 0.1f, true, 0.1f);
     
 }
@@ -140,6 +144,7 @@ void AShooterCharacter::SetPlayerNameOnServer_Implementation(const FString& NewN
         OnRep_CustomPlayerName();
         return;
     }
+    
     CustomPlayerName = NewName;
     GEngine->AddOnScreenDebugMessage(
             -1, 10.0f, FColor::Red,
@@ -153,10 +158,6 @@ void AShooterCharacter::OnRep_CustomPlayerName()
     {
         if (UPlayerNameWidget* PlayerNameWidget = Cast<UPlayerNameWidget>(NameWidget))
         {
-            GEngine->AddOnScreenDebugMessage(
-            -1, 10.0f, FColor::Green,
-            FString::Printf(TEXT("ABC"))
-                );
             PlayerNameWidget->SetDisplayName(CustomPlayerName);
             if (FWidgetValidationTimer.IsValid())
             {
