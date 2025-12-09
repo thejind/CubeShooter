@@ -7,15 +7,11 @@
 void UPlayerNameWidget::SetDisplayName(const FString& NewName)
 {
 	GEngine->AddOnScreenDebugMessage(
-			-1, 3.0f, FColor::Green,
-			FString::Printf(TEXT("UI Fnc Called"))
+			-1, 10.f, FColor::Green,
+			FString::Printf(TEXT("UI Fnc Called %s"), *NewName)
 		);
 	if (PlayerNameText)
 	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 3.0f, FColor::Green,
-			FString::Printf(TEXT("UI Fnc Called"))
-		);
 		PlayerNameText->SetText(FText::FromString(NewName));
 	}
 }

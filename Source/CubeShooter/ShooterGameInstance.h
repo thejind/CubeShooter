@@ -30,6 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void SetPendingDisplayName(const FString& DisplayName);
 	
+	UPROPERTY()
 	FString PendingDisplayName;
 	
 private:

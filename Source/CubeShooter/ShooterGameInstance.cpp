@@ -39,7 +39,7 @@ void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
 }
 
 void UShooterGameInstance::SetPendingDisplayName(const FString& DisplayName)
-{
+{ 
 	PendingDisplayName = DisplayName;
 }
 

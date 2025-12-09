@@ -45,6 +45,7 @@ public:
 	UFUNCTION() 
 	void OnRep_PlayerColor();
 	
+	
 	UPROPERTY(ReplicatedUsing=OnRep_DisplayName)
 	FString DisplayName;
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerScore)
