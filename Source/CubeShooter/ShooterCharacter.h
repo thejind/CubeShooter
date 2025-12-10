@@ -5,14 +5,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/WidgetComponent.h"
-
 #include "ShooterCharacter.generated.h"
 
 
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-class ABasicBullet;
+class ABulletProjectile;
 
 UCLASS()
 class CUBESHOOTER_API AShooterCharacter : public ACharacter
@@ -21,9 +20,7 @@ class CUBESHOOTER_API AShooterCharacter : public ACharacter
 
 public:
 	AShooterCharacter();
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	TSubclassOf<ABasicBullet> BulletClass;
+
 	
 protected:
 	virtual void BeginPlay() override;
@@ -37,7 +34,8 @@ protected:
 	
 	void AwardScore();
 	
-	void SpawnVisualBullet();
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bullet")
+	TSubclassOf<ABulletProjectile> BulletProjectileClass;
 	
 	// Enhanced Input Mapping Context
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")

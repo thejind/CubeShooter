@@ -35,7 +35,7 @@ void UScoreboardWidget::UpdateScoreboard()
 			FString PlayerName = IPlayerInfoInterface::Execute_GetPlayerDisplayName(PlayerState);
 			
 			GEngine->AddOnScreenDebugMessage(
-						-1, 10.0f, FColor::Red,
+						4, 10.0f, FColor::Red,
 							FString::Printf(TEXT("Server Player Name %s and Player Score %d"), *PlayerName, PlayerScore)
 					);
  
@@ -44,10 +44,7 @@ void UScoreboardWidget::UpdateScoreboard()
 			{
 				PlayerRow->SetPlayerInfo(PlayerName, PlayerScore);
 				ScoreListBox->AddChild(PlayerRow);
-				GEngine->AddOnScreenDebugMessage(
-									-1, 10.0f, FColor::Red,
-										FString::Printf(TEXT("Added Player"))
-								);
+				
 			}
 		}
 	}

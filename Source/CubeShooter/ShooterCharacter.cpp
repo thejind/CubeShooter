@@ -16,7 +16,7 @@
 #include "Net/UnrealNetwork.h"
 #include "CubeShooter/Widgets/PlayerNameWidget.h"
 #include "Engine/World.h"
-#include "BasicBullet.h"
+#include "BulletProjectile.h"
 #include "Kismet/GameplayStatics.h"
 
 AShooterCharacter::AShooterCharacter()
@@ -112,7 +112,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
     if (FireAction)
     {
-        EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, this, &AShooterCharacter::Fire);
+        EnhancedInput->BindAction(FireAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Fire);
     }
 }
 
@@ -125,34 +125,10 @@ void AShooterCharacter::AwardScore()
     }   
 }
 
-void AShooterCharacter::SpawnVisualBullet()
-{
-    if (!BulletClass) return;
- 
-    FVector SpawnLocation;
-    FRotator SpawnRotation;
- 
-    if (APlayerController* PC = Cast<APlayerController>(GetController()))
-    {
-        PC->GetPlayerViewPoint(SpawnLocation, SpawnRotation);
-    }
- 
-    SpawnLocation += SpawnRotation.Vector() * 100.f;
- 
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.Instigator = this;
- 
-    ABasicBullet* SpawnedBullet = GetWorld()->SpawnActor<ABasicBullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
- 
-    if (SpawnedBullet)
-    {
-        SpawnedBullet->FireInDirection(SpawnRotation.Vector());
-    }
-}
 
 void AShooterCharacter::ServerShoot_Implementation(const FVector& Start, const FVector& End)
 {
+    // 1. Perform line trace for instant hit detection and gameplay logic
     FHitResult Hit;
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
@@ -163,6 +139,26 @@ void AShooterCharacter::ServerShoot_Implementation(const FVector& Start, const F
         {
             Cube->OnShot(GetPlayerState());
         }
+    }
+ 
+    // 2. Spawn replicated projectile for visual feedback
+    FVector ShootDirection = (End - Start).GetSafeNormal();
+ 
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+ 
+    ABulletProjectile* Projectile = GetWorld()->SpawnActor<ABulletProjectile>(
+        BulletProjectileClass,
+        Start,
+        ShootDirection.Rotation(),
+        SpawnParams
+    );
+ 
+    if (Projectile)
+    {
+        Projectile->FireInDirection(ShootDirection);
     }
 }
 
@@ -203,9 +199,10 @@ void AShooterCharacter::SetPlayerNameOnServer_Implementation(const FString& NewN
     if (CustomPlayerName != NewName)
     {
         CustomPlayerName = NewName;
-        // Force replication update immediately if needed
+        
+        // Force replication update immediately
         OnRep_CustomPlayerName();
-        // Now propagate to PlayerState on server
+        // propagate to PlayerState on server
         if (HasAuthority())  // Make sure running on server
         {
             if (AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>())
@@ -310,12 +307,19 @@ void AShooterCharacter::JumpStopped(const FInputActionValue& Value)
 
 void AShooterCharacter::Fire(const FInputActionValue& Value)
 {
+    UE_LOG(LogTemp, Warning, TEXT("Fire input value: %d"), Value.Get<bool>());
     if (Value.Get<bool>())  // Boolean trigger input (pressed)
     {
         FVector Start = FPSCameraComponent->GetComponentLocation(); 
         FVector End = Start + (FPSCameraComponent->GetForwardVector() * 2000.f);
         ServerShoot(Start, End);
-        SpawnVisualBullet();
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(
+                -1, 10.0f, FColor::Red,
+                    FString::Printf(TEXT("Shooting Else Triggered"))
+            );
     }
 }
 

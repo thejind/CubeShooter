@@ -25,6 +25,7 @@ APhysicsCube::APhysicsCube()
 void APhysicsCube::BeginPlay()
 {
 	Super::BeginPlay();
+	Tags.AddUnique(FName(TEXT("PhysicsActor")));
 	SetLifeSpan(10.f);
 }
 
