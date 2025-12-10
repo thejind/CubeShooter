@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "Interfaces/PlayerInfoInterface.h"
 #include "ShooterPlayerState.generated.h"
 
 
@@ -13,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerNameChanged, const FString&
  * 
  */
 UCLASS()
-class CUBESHOOTER_API AShooterPlayerState : public APlayerState
+class CUBESHOOTER_API AShooterPlayerState : public APlayerState, public IPlayerInfoInterface
 {
 	GENERATED_BODY()
 	
@@ -22,32 +23,31 @@ public:
 	AShooterPlayerState();
 	
 	// Getters
-	FORCEINLINE FString GetDisplayName() const { return DisplayName; }
-	FORCEINLINE int32 GetPlayerScore() const { return PlayerScore;}
-	
-	UFUNCTION(BlueprintCallable, Category = "Components|PlayerState")
-	void SetDisplayName(const FString& NewName);
+	virtual int32 GetPlayerScore_Implementation() const override { return PlayerScore;}
+	virtual FString GetPlayerDisplayName_Implementation() const override { return PlayerDisplayName;}
 	
 	void AddPlayerScore(int32 Delta);
 	
-	FOnPlayerNameChanged OnPlayerNameChanged;
-	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	// Called when PlayerName replicated
-	UFUNCTION()
-	void OnRep_DisplayName();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetPlayerDisplayName(const FString& NewName);
 	
-	// Called when PlayerName replicated
+	void SetPlayerDisplayName(const FString& NewName); // Server-only direct setter
+	
+	// Called when PlayerScore replicated
+	UFUNCTION()
+	void OnRep_PlayerDisplayName();
+	
+	// Called when PlayerScore replicated
 	UFUNCTION()
 	void OnRep_PlayerScore();
 	
 	UFUNCTION() 
 	void OnRep_PlayerColor();
 	
-	
-	UPROPERTY(ReplicatedUsing=OnRep_DisplayName)
-	FString DisplayName;
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerDisplayName)
+	FString PlayerDisplayName;
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerScore)
 	int32 PlayerScore;
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerColor) 

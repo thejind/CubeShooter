@@ -5,12 +5,14 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/WidgetComponent.h"
+
 #include "ShooterCharacter.generated.h"
+
 
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-class ACubeProjectile;
+class ABasicBullet;
 
 UCLASS()
 class CUBESHOOTER_API AShooterCharacter : public ACharacter
@@ -19,7 +21,9 @@ class CUBESHOOTER_API AShooterCharacter : public ACharacter
 
 public:
 	AShooterCharacter();
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	TSubclassOf<ABasicBullet> BulletClass;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -27,7 +31,14 @@ protected:
 	virtual void Tick( float DeltaTime ) override;
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerShoot(const FVector& Start, const FVector& End);
+	
+	void AwardScore();
+	
+	void SpawnVisualBullet();
+	
 	// Enhanced Input Mapping Context
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -70,7 +81,6 @@ protected:
 	
 	UFUNCTION()
 	void SetNameTagRotationToPlayer();
-	
 	
 	// Input callbacks
 	void Move(const FInputActionValue& Value);

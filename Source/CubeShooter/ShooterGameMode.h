@@ -16,4 +16,19 @@ class CUBESHOOTER_API AShooterGameMode : public AGameMode
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	
+	virtual void BeginPlay() override;
+	
+protected:
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spawning")
+	TSubclassOf<class APhysicsCube> PhysicsCubeClass;
+ 
+	UPROPERTY(EditDefaultsOnly, Category="Spawning")
+	float SpawnInterval = 5.f;
+ 
+	FTimerHandle SpawnTimerHandle;
+ 
+	void SpawnPhysicsCube();
+	
+	
 };

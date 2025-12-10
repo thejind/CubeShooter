@@ -9,12 +9,14 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PhysicsCube.h"
 #include "ShooterPlayerState.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
 #include "CubeShooter/Widgets/PlayerNameWidget.h"
 #include "Engine/World.h"
+#include "BasicBullet.h"
 #include "Kismet/GameplayStatics.h"
 
 AShooterCharacter::AShooterCharacter()
@@ -114,6 +116,67 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     }
 }
 
+void AShooterCharacter::AwardScore()
+{
+    AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>();
+    if (PS && HasAuthority())
+    {
+        PS->AddPlayerScore(1);
+    }   
+}
+
+void AShooterCharacter::SpawnVisualBullet()
+{
+    if (!BulletClass) return;
+ 
+    FVector SpawnLocation;
+    FRotator SpawnRotation;
+ 
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        PC->GetPlayerViewPoint(SpawnLocation, SpawnRotation);
+    }
+ 
+    SpawnLocation += SpawnRotation.Vector() * 100.f;
+ 
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = this;
+ 
+    ABasicBullet* SpawnedBullet = GetWorld()->SpawnActor<ABasicBullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+ 
+    if (SpawnedBullet)
+    {
+        SpawnedBullet->FireInDirection(SpawnRotation.Vector());
+    }
+}
+
+void AShooterCharacter::ServerShoot_Implementation(const FVector& Start, const FVector& End)
+{
+    FHitResult Hit;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+ 
+    if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+    {
+        if (APhysicsCube* Cube = Cast<APhysicsCube>(Hit.GetActor()))
+        {
+            Cube->OnShot(GetPlayerState());
+        }
+    }
+}
+
+bool AShooterCharacter::ServerShoot_Validate(const FVector& Start, const FVector& End)
+{
+    // Confirm the caller is controlled by a valid player controller
+    if (!GetController())
+    {
+        return false;
+    }
+    
+    return true;
+}
+
 
 void AShooterCharacter::SetupLocalDisplayName()
 {
@@ -142,6 +205,14 @@ void AShooterCharacter::SetPlayerNameOnServer_Implementation(const FString& NewN
         CustomPlayerName = NewName;
         // Force replication update immediately if needed
         OnRep_CustomPlayerName();
+        // Now propagate to PlayerState on server
+        if (HasAuthority())  // Make sure running on server
+        {
+            if (AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>())
+            {
+                PS->SetPlayerDisplayName(CustomPlayerName);
+            }
+        }
         return;
     }
     
@@ -239,7 +310,13 @@ void AShooterCharacter::JumpStopped(const FInputActionValue& Value)
 
 void AShooterCharacter::Fire(const FInputActionValue& Value)
 {
-    
+    if (Value.Get<bool>())  // Boolean trigger input (pressed)
+    {
+        FVector Start = FPSCameraComponent->GetComponentLocation(); 
+        FVector End = Start + (FPSCameraComponent->GetForwardVector() * 2000.f);
+        ServerShoot(Start, End);
+        SpawnVisualBullet();
+    }
 }
 
 
