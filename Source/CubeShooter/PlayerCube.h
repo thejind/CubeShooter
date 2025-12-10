@@ -20,7 +20,10 @@ public:
  
 	UPROPERTY(ReplicatedUsing=OnRep_Color)
 	FLinearColor CubeColor;
- 
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Materials")
+	UMaterialInterface* BaseMaterial;
+	
 	UFUNCTION()
 	void OnRep_Color();
  

@@ -25,6 +25,8 @@ public:
 	// Getters
 	virtual int32 GetPlayerScore_Implementation() const override { return PlayerScore;}
 	virtual FString GetPlayerDisplayName_Implementation() const override { return PlayerDisplayName;}
+	virtual FLinearColor GetPlayerColor_Implementation() const override { return PlayerColor;}
+	virtual void SetPlayerColor_Implementation(const FLinearColor& NewColor) override;
 	
 	void AddPlayerScore(int32 Delta);
 	

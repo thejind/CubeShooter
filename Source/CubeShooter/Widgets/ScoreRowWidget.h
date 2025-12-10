@@ -19,7 +19,7 @@ class CUBESHOOTER_API UScoreRowWidget : public UUserWidget
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerInfo(const FString& PlayerName, int32 PlayerScore);
+	void SetPlayerInfo(const FString& PlayerName, int32 PlayerScore, FLinearColor Color);
  
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -3,6 +3,7 @@
 
 #include "PlayerCube.h"
 #include "Net/UnrealNetwork.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
@@ -14,22 +15,20 @@ APlayerCube::APlayerCube()
  
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = MeshComponent;
- 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (CubeMesh.Succeeded())
-	{
-		MeshComponent->SetStaticMesh(CubeMesh.Object);
-	}
+	bOnlyRelevantToOwner = false;
+	bNetLoadOnClient = true;
+	NetDormancy = DORM_Awake;
 }
 
 void APlayerCube::OnRep_Color()
 {
-	if (MeshComponent)
+	if (MeshComponent && BaseMaterial)
 	{
-		UMaterialInstanceDynamic* DynMaterial = MeshComponent->CreateAndSetMaterialInstanceDynamic(0);
+		UMaterialInstanceDynamic* DynMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
 		if (DynMaterial)
 		{
 			DynMaterial->SetVectorParameterValue("BaseColor", CubeColor);
+			MeshComponent->SetMaterial(0, DynMaterial);
 		}
 	}
 }

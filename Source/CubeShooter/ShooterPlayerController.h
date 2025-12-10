@@ -19,12 +19,14 @@ class CUBESHOOTER_API AShooterPlayerController : public APlayerController
 	
 	virtual void BeginPlay() override;
 	
+	
+	
 	void SpawnPlayerCube();
 	
 public:
 	UPROPERTY()
 	APlayerCube* OwnedCube;
 	
-
-	
+	UPROPERTY(EditDefaultsOnly, Category = "CubeShooter")
+	TSubclassOf<APlayerCube> PlayerCubeClass;
 };

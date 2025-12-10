@@ -9,6 +9,16 @@ AShooterPlayerState::AShooterPlayerState()
 	bReplicates = true;
 	PlayerDisplayName = TEXT("Unknown");
 	PlayerScore = 0;
+	PlayerColor = FLinearColor::Red;
+}
+
+void AShooterPlayerState::SetPlayerColor_Implementation(const FLinearColor& NewColor)
+{
+	if (HasAuthority())
+	{
+		PlayerColor = NewColor;
+		OnRep_PlayerColor(); // update on server instantly
+	}
 }
 
 void AShooterPlayerState::AddPlayerScore(int32 Delta)
@@ -33,6 +43,7 @@ void AShooterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	
 	DOREPLIFETIME(AShooterPlayerState, PlayerDisplayName);
 	DOREPLIFETIME(AShooterPlayerState, PlayerScore);
+	DOREPLIFETIME(AShooterPlayerState, PlayerColor);
 }
 
 void AShooterPlayerState::ServerSetPlayerDisplayName_Implementation(const FString& NewName)
@@ -45,6 +56,7 @@ bool AShooterPlayerState::ServerSetPlayerDisplayName_Validate(const FString& New
 	return !NewName.IsEmpty(); // Basic validation
 }
 
+
 void AShooterPlayerState::SetPlayerDisplayName(const FString& NewName)
 {
 	if (HasAuthority() && PlayerDisplayName != NewName)
@@ -56,8 +68,7 @@ void AShooterPlayerState::SetPlayerDisplayName(const FString& NewName)
 
 void AShooterPlayerState::OnRep_PlayerDisplayName()
 {
-	// Optional: update UI or log
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("PlayerState Name Replicated: %s"), *PlayerDisplayName));
+	
 }
 
 void AShooterPlayerState::OnRep_PlayerScore()
@@ -67,4 +78,5 @@ void AShooterPlayerState::OnRep_PlayerScore()
 
 void AShooterPlayerState::OnRep_PlayerColor()
 {
+	
 }

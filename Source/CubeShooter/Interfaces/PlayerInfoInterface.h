@@ -28,4 +28,10 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="PlayerInfo")
 	FString GetPlayerDisplayName() const;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="PlayerInfo")
+	void SetPlayerColor(const FLinearColor& NewColor) ;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="PlayerInfo")
+	FLinearColor GetPlayerColor() const;
 };

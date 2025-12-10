@@ -33,16 +33,13 @@ void UScoreboardWidget::UpdateScoreboard()
 		{
 			int32 PlayerScore = IPlayerInfoInterface::Execute_GetPlayerScore(PlayerState);
 			FString PlayerName = IPlayerInfoInterface::Execute_GetPlayerDisplayName(PlayerState);
+			FLinearColor PlayerColor = IPlayerInfoInterface::Execute_GetPlayerColor(PlayerState);
 			
-			GEngine->AddOnScreenDebugMessage(
-						4, 10.0f, FColor::Red,
-							FString::Printf(TEXT("Server Player Name %s and Player Score %d"), *PlayerName, PlayerScore)
-					);
  
 			UScoreRowWidget* PlayerRow = CreateWidget<UScoreRowWidget>(World, ScoreRowWidgetClass);
 			if (PlayerRow)
 			{
-				PlayerRow->SetPlayerInfo(PlayerName, PlayerScore);
+				PlayerRow->SetPlayerInfo(PlayerName, PlayerScore, PlayerColor);
 				ScoreListBox->AddChild(PlayerRow);
 				
 			}
