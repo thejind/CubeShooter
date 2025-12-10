@@ -22,10 +22,10 @@ public:
 	virtual void Shutdown() override;
 	
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
-	void HostSessionWithCode(const FString& JoinCode);
+	void HostGame();
  
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
-	void JoinSessionWithCode(const FString& JoinCode);
+	void JoinGame();
 	
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void SetPendingDisplayName(const FString& DisplayName);

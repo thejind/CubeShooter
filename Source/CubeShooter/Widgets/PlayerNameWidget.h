@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerNameWidget.generated.h"
-
+class UTextBlock;
 /**
  * 
  */
@@ -15,9 +15,11 @@ class CUBESHOOTER_API UPlayerNameWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	//Text Block for Name 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* PlayerNameText;
- 
+	UTextBlock* PlayerNameText;
+	
+	// Setter for Display Name
 	UFUNCTION(BlueprintCallable, Category="Player")
 	void SetDisplayName(const FString& NewName);
 };

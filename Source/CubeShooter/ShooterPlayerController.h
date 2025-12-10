@@ -7,6 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "ShooterPlayerController.generated.h"
 
+
+class APlayerCube;
 /**
  * 
  */
@@ -17,6 +19,12 @@ class CUBESHOOTER_API AShooterPlayerController : public APlayerController
 	
 	virtual void BeginPlay() override;
 	
+	void SpawnPlayerCube();
+	
+public:
+	UPROPERTY()
+	APlayerCube* OwnedCube;
 	
 
+	
 };

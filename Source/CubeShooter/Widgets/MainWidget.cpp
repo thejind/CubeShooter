@@ -9,6 +9,4 @@ void UMainWidget::SetupScoreBoardWidget(UScoreboardWidget* WidgetPtr)
 	if (WidgetPtr)
 		ScoreboardWidget = WidgetPtr;
 	
-	/*if (ScorePlaceholder)
-		ScorePlaceholder->SetContent(Cast<UWidget>(ScoreboardWidget));*/
 }

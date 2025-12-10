@@ -6,6 +6,7 @@
 
 void UPlayerNameWidget::SetDisplayName(const FString& NewName)
 {
+	
 	if (PlayerNameText)
 	{
 		PlayerNameText->SetText(FText::FromString(NewName));

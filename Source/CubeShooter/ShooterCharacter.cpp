@@ -214,10 +214,6 @@ void AShooterCharacter::SetPlayerNameOnServer_Implementation(const FString& NewN
     }
     
     CustomPlayerName = NewName;
-    GEngine->AddOnScreenDebugMessage(
-            -1, 10.0f, FColor::Red,
-                FString::Printf(TEXT("Server Player Name %s"), *CustomPlayerName)
-        );
 }
 
 void AShooterCharacter::OnRep_CustomPlayerName()

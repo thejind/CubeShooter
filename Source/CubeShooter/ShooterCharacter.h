@@ -62,9 +62,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> PlayerNameWidgetClass;
 	
+	// Setup Display Name on Local Client
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void SetupLocalDisplayName();
 	
+	// Setup Display Name on Server
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetPlayerNameOnServer(const FString& NewName);
 	

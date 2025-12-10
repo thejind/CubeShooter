@@ -15,11 +15,9 @@ class CUBESHOOTER_API UMainWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	//Scoreboard Widget Reference
 	UPROPERTY()
 	UScoreboardWidget* ScoreboardWidget;
-	
-	UPROPERTY(meta = (BindWidget))
-	USizeBox* ScorePlaceholder;
 	
 public:
 	

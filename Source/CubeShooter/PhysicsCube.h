@@ -26,9 +26,8 @@ private:
 	// Destroy cube on all clients
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DestroyCube();
- 
-	
- 
+
+
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

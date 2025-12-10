@@ -20,7 +20,7 @@ void UShooterGameInstance::Shutdown()
 	
 }
 
-void UShooterGameInstance::HostSessionWithCode(const FString& JoinCode)
+void UShooterGameInstance::HostGame()
 {
 	if (!MultiplayerManager)
 	{
@@ -29,7 +29,7 @@ void UShooterGameInstance::HostSessionWithCode(const FString& JoinCode)
 	MultiplayerManager->CreateSession();
 }
 
-void UShooterGameInstance::JoinSessionWithCode(const FString& JoinCode)
+void UShooterGameInstance::JoinGame()
 {
 	if (!MultiplayerManager)
 	{

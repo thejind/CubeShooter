@@ -21,6 +21,8 @@ class CUBESHOOTER_API UScoreboardWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	
+	// To Update Scoreboard
 	UFUNCTION(BlueprintCallable)
 	void UpdateScoreboard();
  
@@ -28,6 +30,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* ScoreListBox;
  
+	// Widget Ref to Create
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UScoreRowWidget> ScoreRowWidgetClass;
 	
