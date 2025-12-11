@@ -182,20 +182,14 @@ void AShooterCharacter::SetupLocalDisplayName()
     if (UShooterGameInstance* SGI = Cast<UShooterGameInstance>(GetGameInstance()))
     {
         SetPlayerNameOnServer(SGI->PendingDisplayName);
-        GEngine->AddOnScreenDebugMessage(
-            -1, 10.0f, FColor::Green,
-            FString::Printf(TEXT("Local Player Name %s"), *SGI->PendingDisplayName)
-        );
+        
     }
         
 }
 
 void AShooterCharacter::SetPlayerNameOnServer_Implementation(const FString& NewName)
 {
-    GEngine->AddOnScreenDebugMessage(
-            -1, 10.0f, FColor::Green,
-                FString::Printf(TEXT("Server Player Name %s"), *NewName)
-        );
+    
     if (CustomPlayerName != NewName)
     {
         CustomPlayerName = NewName;
@@ -309,13 +303,6 @@ void AShooterCharacter::Fire(const FInputActionValue& Value)
         FVector Start = FPSCameraComponent->GetComponentLocation(); 
         FVector End = Start + (FPSCameraComponent->GetForwardVector() * 2000.f);
         ServerShoot(Start, End);
-    }
-    else
-    {
-        GEngine->AddOnScreenDebugMessage(
-                -1, 10.0f, FColor::Red,
-                    FString::Printf(TEXT("Shooting Else Triggered"))
-            );
     }
 }
 

@@ -7,59 +7,52 @@
 #include "PlayerCube.h"
 
 
+AShooterPlayerController::AShooterPlayerController()
+	: OwnedCube(nullptr)
+{
+	
+}
+
 void AShooterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnPlayerCube();
+	
 }
 
-void AShooterPlayerController::SpawnPlayerCube()
+void AShooterPlayerController::OnRep_PlayerState()
 {
-	if (!HasAuthority() || OwnedCube)
-		return;
- 
-	APlayerState* PS = GetPlayerState<APlayerState>();
-	if (!PS)
-	{
-		// PlayerState not ready, retry after short delay to eliminate infinite recursion
-		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			SpawnPlayerCube();
-		});
-		return;
-	}
- 
-	// Spawn location and params
-	FVector LocalSpawnLocation = GetPawn() ? GetPawn()->GetActorLocation() + FVector(200, 0, 0) : FVector(0, 0, 200);
-	FRotator SpawnRotation = FRotator::ZeroRotator;
- 
+	Super::OnRep_PlayerState();
+}
+
+void AShooterPlayerController::SpawnPlayerCube(FLinearColor UniqueColor, const FVector& Location, const FRotator& Rotation)
+{
+	
+	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetPawn();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
  
 	if (!PlayerCubeClass)
 		return;
- 
-	OwnedCube = GetWorld()->SpawnActor<APlayerCube>(PlayerCubeClass, LocalSpawnLocation, SpawnRotation, SpawnParams);
+	
+	OwnedCube = GetWorld()->SpawnActor<APlayerCube>(PlayerCubeClass, Location, Rotation, SpawnParams);
 	if (OwnedCube)
 	{
-		// Generate unique color seeded by PlayerId to ensure uniqueness
-		int32 PlayerId = PS->GetPlayerId();
- 
-		// Use FRandomStream for seeded randomness
-		FRandomStream Stream(PlayerId + 12345); // Any arbitrary seed offset
- 
-		float Hue = Stream.FRandRange(0.f, 360.f);
-		FLinearColor UniqueColor = FLinearColor::MakeFromHSV8((uint8)Hue, 255, 255);
- 
+		APlayerState* PS = GetPlayerState<APlayerState>();
+		if (!PS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SpawnPlayerCube: PlayerState not found for PlayerController %s"), *GetName());
+			return;
+		}
+		
 		OwnedCube->SetCubeColor(UniqueColor);
  
-		// Update PlayerState via interface for replication
 		if (PS->GetClass()->ImplementsInterface(UPlayerInfoInterface::StaticClass()))
 		{
 			IPlayerInfoInterface::Execute_SetPlayerColor(PS, UniqueColor);
 		}
+		
 	}
 }

@@ -32,5 +32,5 @@ protected:
  
 	void SpawnPhysicsCube();
 	
-	
+	FVector CachedLocation = FVector(1860.f, -350.f,100.f);
 };

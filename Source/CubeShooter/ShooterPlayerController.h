@@ -16,12 +16,12 @@ UCLASS()
 class CUBESHOOTER_API AShooterPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+	AShooterPlayerController();
 	virtual void BeginPlay() override;
 	
+	virtual void OnRep_PlayerState() override;
 	
 	
-	void SpawnPlayerCube();
 	
 public:
 	UPROPERTY()
@@ -29,4 +29,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "CubeShooter")
 	TSubclassOf<APlayerCube> PlayerCubeClass;
+	
+	void SpawnPlayerCube(FLinearColor UniqueColor, const FVector& Location, const FRotator& Rotation);
 };
