@@ -17,6 +17,7 @@ UMultiplayerManager::UMultiplayerManager()
 		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnCreateSessionComplete);
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnFindSessionComplete);
 		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnJoinSessionComplete);
+		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UMultiplayerManager::OnDestroySessionComplete);
 	}
 }
 
@@ -54,6 +55,23 @@ void UMultiplayerManager::OnJoinSessionComplete(FName SessionName, EOnJoinSessio
 	}
 }
 
+void UMultiplayerManager::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
+	}
+ 
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Session left (destroyed) successfully."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to leave session."));
+	}
+}
+
 void UMultiplayerManager::CreateSession()
 {
 	UE_LOG(LogTemp, Warning, TEXT("CreateServer"));
@@ -77,3 +95,18 @@ void UMultiplayerManager::JoinSession()
 
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 }
+
+void UMultiplayerManager::LeaveSession()
+{
+	if (!SessionInterface.IsValid())
+	{
+		return;
+	}
+	
+	FName SessionName = FName("Create Session");
+	if (!SessionInterface->DestroySession(SessionName))
+	{
+		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
+	}
+}
+

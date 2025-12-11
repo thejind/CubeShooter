@@ -17,6 +17,9 @@ class CUBESHOOTER_API UMultiplayerManager : public UObject
 	GENERATED_BODY()
 	
 public:
+	
+	FDelegateHandle DestroySessionCompleteDelegateHandle;
+	
 	UMultiplayerManager();
 	
 	FDelegateHandle CreateSessionCompleteDelegateHandle;
@@ -28,6 +31,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void JoinSession();
 	
+	UFUNCTION(BlueprintCallable)
+	void LeaveSession();
+	
+	
 protected:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
@@ -37,6 +44,8 @@ protected:
 	virtual void OnCreateSessionComplete(FName SessionName, bool Succeeded);
 	virtual void OnFindSessionComplete(bool Succeeded);
 	virtual void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	
 	
 	
 };

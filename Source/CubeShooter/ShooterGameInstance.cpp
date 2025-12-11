@@ -38,6 +38,15 @@ void UShooterGameInstance::JoinGame()
 	MultiplayerManager->JoinSession();
 }
 
+void UShooterGameInstance::LeaveGame()
+{
+	if (!MultiplayerManager)
+	{
+		MultiplayerManager = NewObject<UMultiplayerManager>(this);
+	}
+	MultiplayerManager->LeaveSession();
+}
+
 void UShooterGameInstance::SetPendingDisplayName(const FString& DisplayName)
 { 
 	PendingDisplayName = DisplayName;

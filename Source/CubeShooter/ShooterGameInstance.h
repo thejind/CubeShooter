@@ -28,6 +28,9 @@ public:
 	void JoinGame();
 	
 	UFUNCTION(BlueprintCallable, Category="Multiplayer")
+	void LeaveGame();
+	
+	UFUNCTION(BlueprintCallable, Category="Multiplayer")
 	void SetPendingDisplayName(const FString& DisplayName);
 	
 	UPROPERTY()

@@ -182,7 +182,6 @@ void AShooterCharacter::SetupLocalDisplayName()
     if (UShooterGameInstance* SGI = Cast<UShooterGameInstance>(GetGameInstance()))
     {
         SetPlayerNameOnServer(SGI->PendingDisplayName);
-        
     }
         
 }
